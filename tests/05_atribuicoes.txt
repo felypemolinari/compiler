@@ -1,0 +1,24 @@
+:3 (1,5) atribuicao com variaveis e vetores recebendo expressoes
+program teste_atribuicoes.
+
+int:) a, b, i, v[10], m[10].
+
+function int:) f(int:) x)
+{
+  return x * 2.
+}
+
+begin
+  :3 variavel recebendo literal, variavel, vetor e chamada de sub-rotina
+  a = 10.
+  b = a.
+  a = v[i].
+  a = f(3).
+
+  :3 vetor recebendo expressao completa
+  v[i] = a + b * v[i + 1] - f(a) / 2.
+  v[f(i)] = m[i] % 3.
+
+  :3 expressao misturando tudo
+  a = (v[0] + f(b) * 2 - m[i]) / (b + 1) % 7.
+end.

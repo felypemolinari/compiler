@@ -1,0 +1,60 @@
+:3 (1,5) definicao de sub-rotinas e chamada como operacao
+program teste_subrotinas.
+
+int:) x, y, v[10].
+
+:3 funcao com parametro escalar
+function int:) dobro(int:) n)
+{
+  return n * 2.
+}
+
+:3 funcao com varios parametros de tipos diferentes
+function float:) media(float:) soma, int:) qtd)
+{
+  return soma / qtd.
+}
+
+:3 funcao recebendo vetor como parametro
+function int:) somatorio(int:) vet[], int:) tam)
+{
+  int:) k, acc.
+  acc = 0.
+  for (k = 0, k < tam, k = k + 1) do
+  {
+    acc = acc + vet[k].
+  }
+  return acc.
+}
+
+:3 procedimento (sem tipo de retorno) e sem parametros
+function separador()
+{
+  write("--------").
+  return.
+}
+
+:3 procedimento com parametros
+function imprime(string:) rotulo, int:) valor)
+{
+  write(rotulo, valor).
+}
+
+begin
+  :3 chamada como comando
+  separador().
+  imprime("x = ", x).
+
+  :3 chamada como operacao dentro de expressao
+  y = dobro(x) + somatorio(v, 10).
+  y = dobro(dobro(x)) * 3.
+
+  :3 argumentos: variaveis, vetores e literais
+  imprime("v[0]", v[0]).
+  y = somatorio(v, dobro(5)).
+
+  if (dobro(x) > somatorio(v, 10)) then
+  {
+    write(media(10.0, 4)).
+  }
+end.

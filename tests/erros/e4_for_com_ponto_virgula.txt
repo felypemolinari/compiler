@@ -1,0 +1,8 @@
+program erro4.
+int:) i.
+begin
+  for (i = 0; i < 10; i = i + 1) do
+  {
+    i = i.
+  }
+end.

@@ -1,0 +1,5 @@
+program erro3.
+int:) a, b.
+begin
+  a = (b + 1 * 2.
+end.

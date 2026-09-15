@@ -1,0 +1,16 @@
+:3 (1,5) declaracao de variaveis e vetores com multiplos ids
+program teste_declaracoes.
+
+int:) a, b, c.
+int:) v[10], m[0xFF], w[0b1010].
+float:) media, notas[3].
+string:) nome, sobrenome.
+boolean:) ok, fim.
+char:) letra, buffer[80].
+
+begin
+  int:) local1, local2, aux[5].
+  float:) temp.
+  a = 1.
+  local1 = 2.
+end.

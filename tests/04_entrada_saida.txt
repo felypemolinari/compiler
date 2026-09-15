@@ -1,0 +1,20 @@
+:3 (0,5) entrada e (0,5) saida de dados
+program teste_io.
+
+int:) n, i, v[10].
+float:) nota.
+string:) nome.
+
+begin
+  :3 leitura com variaveis e vetores
+  read(n).
+  read(nome, nota).
+  read(v[0], v[i], v[i + 1]).
+
+  :3 escrita com literais, variaveis e vetores
+  write("Ola mundo").
+  write(n).
+  write(v[i]).
+  write("nome: ", nome, " nota: ", nota, " v[0]: ", v[0]).
+  write('c', 3.14, 0xFF, true, false).
+end.

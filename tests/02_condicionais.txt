@@ -1,0 +1,43 @@
+:3 (0,5) desvio simples e (1,0) desvio composto
+program teste_condicionais.
+
+int:) a, b, v[10].
+boolean:) ok.
+
+begin
+  :3 simples, sem else
+  if (a > 0) then
+  {
+    write("positivo").
+  }
+
+  :3 composto, com else
+  if (a == b) then
+  {
+    ok = true.
+  }
+  else
+  {
+    ok = false.
+  }
+
+  :3 aninhados: simples dentro de composto e vice-versa
+  if (a < b) then
+  {
+    if (v[a] != 0) then
+    {
+      b = b - 1.
+    }
+  }
+  else
+  {
+    if (b >= 10) then
+    {
+      b = 0.
+    }
+    else
+    {
+      b = b + 1.
+    }
+  }
+end.

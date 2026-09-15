@@ -1,0 +1,284 @@
+#Options
+GenerateScanner = true
+GenerateParser = true
+Language = C++
+ScannerName = Lexico
+ParserName = Sintatico
+SemanticName = Semantico
+ScannerCaseSensitive = true
+ScannerTable = Full
+Input = String
+Parser = SLR
+#RegularDefinitions
+ID_START   : [a-zA-Z_]
+ID_PART    : [a-zA-Z0-9_]
+DIGIT      : [0-9]
+BIN        : [01]
+HEX        : [0-9a-fA-F]
+ESCAPE     : [nrtbf0\\\"']
+NOT_SQUOTE : [^'\\\n]
+NOT_DQUOTE : [^\"\\\n]
+BLANK      : [\s\t\n\r]
+#Tokens
+id : {ID_START} {ID_PART}*
+
+program  = id : "program"
+begin    = id : "begin"
+end      = id : "end"
+if       = id : "if"
+then     = id : "then"
+else     = id : "else"
+while    = id : "while"
+do       = id : "do"
+for      = id : "for"
+function = id : "function"
+return   = id : "return"
+read     = id : "read"
+write    = id : "write"
+true     = id : "true"
+false    = id : "false"
+
+op_and = id : "AND"
+op_or  = id : "OR"
+op_not = id : "NOT"
+
+type_int     : "int" ":" ")"
+type_float   : "float" ":" ")"
+type_string  : "string" ":" ")"
+type_boolean : "boolean" ":" ")"
+type_char    : "char" ":" ")"
+
+lit_int_bin : 0 [bB] {BIN}+
+lit_int_hex : 0 [xX] {HEX}+
+lit_int_dec : {DIGIT}+
+lit_real    : {DIGIT}+ "." {DIGIT}+ ( [eE] ( "+" | "-" )? {DIGIT}+ )?
+lit_char    : ' ( {NOT_SQUOTE} | \\ {ESCAPE} ) '
+lit_string  : \" ( {NOT_DQUOTE} | \\ {ESCAPE} )* \"
+
+op_add : "+"
+op_sub : "-"
+op_mul : "*"
+op_div : "/"
+op_mod : "%"
+
+op_greater_eq : ">="
+op_less_eq    : "<="
+op_equal      : "=="
+op_not_equal  : "!="
+op_greater    : ">"
+op_less       : "<"
+
+op_shift_right : ">>"
+op_shift_left  : "<<"
+op_bit_and     : "&"
+op_bit_or      : "|"
+op_bit_not     : "~"
+op_bit_xor     : "^"
+
+op_assign     : "="
+open_paren    : "("
+close_paren   : ")"
+open_bracket  : "["
+close_bracket : "]"
+open_brace    : "{"
+close_brace   : "}"
+comma         : ","
+stmt_end      : "."
+
+: [:] "3" [^\n]*
+: "/" "*" ( [^\*] | \*+ [^\*/] )* \*+ "/"
+: {BLANK}+
+#NonTerminals
+<programa>
+<lista_globais>
+<item_global>
+<declaracao>
+<lista_nomes>
+<nome_decl>
+<tamanho>
+<tipo>
+<subrotina>
+<lista_params>
+<param>
+<bloco>
+<lista_comandos>
+<comando>
+<comando_id>
+<se>
+<enquanto>
+<para>
+<repita>
+<atrib_simples>
+<leitura>
+<lista_variaveis>
+<variavel>
+<escrita>
+<retorno>
+<lista_args>
+<expressao>
+<exp_e>
+<exp_nao>
+<exp_rel>
+<op_relacional>
+<exp_bit_ou>
+<exp_bit_xor>
+<exp_bit_e>
+<exp_desloc>
+<exp_aritmetica>
+<termo>
+<fator>
+<primario>
+<chamada>
+<literal>
+#Grammar
+<programa> ::= program id stmt_end <lista_globais> begin <lista_comandos> end stmt_end
+             | program id stmt_end begin <lista_comandos> end stmt_end ;
+
+<lista_globais> ::= <lista_globais> <item_global>
+                  | <item_global> ;
+
+<item_global> ::= <declaracao>
+                | <subrotina> ;
+
+<declaracao> ::= <tipo> <lista_nomes> stmt_end ;
+
+<lista_nomes> ::= <lista_nomes> comma <nome_decl>
+                | <nome_decl> ;
+
+<nome_decl> ::= id
+              | id open_bracket <tamanho> close_bracket ;
+
+<tamanho> ::= lit_int_dec
+            | lit_int_hex
+            | lit_int_bin ;
+
+<tipo> ::= type_int
+         | type_float
+         | type_string
+         | type_boolean
+         | type_char ;
+
+<subrotina> ::= function <tipo> id open_paren <lista_params> close_paren <bloco>
+              | function <tipo> id open_paren close_paren <bloco>
+              | function id open_paren <lista_params> close_paren <bloco>
+              | function id open_paren close_paren <bloco> ;
+
+<lista_params> ::= <lista_params> comma <param>
+                 | <param> ;
+
+<param> ::= <tipo> id
+          | <tipo> id open_bracket close_bracket ;
+
+<bloco> ::= open_brace <lista_comandos> close_brace
+          | open_brace close_brace ;
+
+<lista_comandos> ::= <lista_comandos> <comando>
+                   | <comando> ;
+
+<comando> ::= <declaracao>
+            | <comando_id>
+            | <se>
+            | <enquanto>
+            | <para>
+            | <repita>
+            | <leitura>
+            | <escrita>
+            | <retorno> ;
+
+<comando_id> ::= id op_assign <expressao> stmt_end
+               | id open_bracket <expressao> close_bracket op_assign <expressao> stmt_end
+               | id open_paren <lista_args> close_paren stmt_end
+               | id open_paren close_paren stmt_end ;
+
+<se> ::= if open_paren <expressao> close_paren then <bloco>
+       | if open_paren <expressao> close_paren then <bloco> else <bloco> ;
+
+<enquanto> ::= while open_paren <expressao> close_paren do <bloco> ;
+
+<para> ::= for open_paren <atrib_simples> comma <expressao> comma <atrib_simples> close_paren do <bloco> ;
+
+<repita> ::= do <bloco> while open_paren <expressao> close_paren stmt_end ;
+
+<atrib_simples> ::= id op_assign <expressao>
+                  | id open_bracket <expressao> close_bracket op_assign <expressao> ;
+
+<leitura> ::= read open_paren <lista_variaveis> close_paren stmt_end ;
+
+<lista_variaveis> ::= <lista_variaveis> comma <variavel>
+                    | <variavel> ;
+
+<variavel> ::= id
+             | id open_bracket <expressao> close_bracket ;
+
+<escrita> ::= write open_paren <lista_args> close_paren stmt_end ;
+
+<retorno> ::= return <expressao> stmt_end
+            | return stmt_end ;
+
+<lista_args> ::= <lista_args> comma <expressao>
+               | <expressao> ;
+
+<expressao> ::= <expressao> op_or <exp_e>
+              | <exp_e> ;
+
+<exp_e> ::= <exp_e> op_and <exp_nao>
+          | <exp_nao> ;
+
+<exp_nao> ::= op_not <exp_nao>
+            | <exp_rel> ;
+
+<exp_rel> ::= <exp_bit_ou> <op_relacional> <exp_bit_ou>
+            | <exp_bit_ou> ;
+
+<op_relacional> ::= op_equal
+                  | op_not_equal
+                  | op_less
+                  | op_greater
+                  | op_less_eq
+                  | op_greater_eq ;
+
+<exp_bit_ou> ::= <exp_bit_ou> op_bit_or <exp_bit_xor>
+               | <exp_bit_xor> ;
+
+<exp_bit_xor> ::= <exp_bit_xor> op_bit_xor <exp_bit_e>
+                | <exp_bit_e> ;
+
+<exp_bit_e> ::= <exp_bit_e> op_bit_and <exp_desloc>
+              | <exp_desloc> ;
+
+<exp_desloc> ::= <exp_desloc> op_shift_left <exp_aritmetica>
+               | <exp_desloc> op_shift_right <exp_aritmetica>
+               | <exp_aritmetica> ;
+
+<exp_aritmetica> ::= <exp_aritmetica> op_add <termo>
+                   | <exp_aritmetica> op_sub <termo>
+                   | <termo> ;
+
+<termo> ::= <termo> op_mul <fator>
+          | <termo> op_div <fator>
+          | <termo> op_mod <fator>
+          | <fator> ;
+
+<fator> ::= op_sub <fator>
+          | op_add <fator>
+          | op_bit_not <fator>
+          | <primario> ;
+
+<primario> ::= id
+             | id open_bracket <expressao> close_bracket
+             | <chamada>
+             | <literal>
+             | open_paren <expressao> close_paren ;
+
+<chamada> ::= id open_paren <lista_args> close_paren
+            | id open_paren close_paren ;
+
+<literal> ::= lit_int_dec
+            | lit_int_hex
+            | lit_int_bin
+            | lit_real
+            | lit_char
+            | lit_string
+            | true
+            | false ;
+

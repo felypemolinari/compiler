@@ -1,0 +1,4 @@
+program erro5.
+begin
+  a, b, c.
+end.

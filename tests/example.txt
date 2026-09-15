@@ -1,0 +1,80 @@
+program exemplo.
+
+:3 declaracao de variaveis e vetores com multiplos nomes
+int:) i, n, soma, v[10].
+float:) media, notas[3].
+string:) nome.
+boolean:) ok.
+
+/* funcao com passagem de parametros */
+function int:) dobro(int:) x)
+{
+  return x * 2.
+}
+
+function int:) somatorio(int:) vet[], int:) tam)
+{
+  int:) k, acc.
+  acc = 0.
+  for (k = 0, k < tam, k = k + 1) do
+  {
+    acc = acc + vet[k].
+  }
+  return acc.
+}
+
+:3 procedimento (sub-rotina sem tipo de retorno)
+function imprime(string:) rotulo, int:) valor)
+{
+  write(rotulo, valor).
+  return.
+}
+
+begin
+  read(n, v[0], notas[1]).
+  nome = "teste".
+  ok = true.
+
+  :3 atribuicao com variaveis, vetores, literais e chamadas de sub-rotina
+  soma = dobro(n) + somatorio(v, 10) * 2 - (n % 3).
+  media = (notas[0] + notas[1] + notas[2]) / 3.0.
+
+  :3 desvio condicional simples
+  if (n > 0 AND NOT (n == 100)) then
+  {
+    write("positivo: ", n).
+  }
+
+  :3 desvio condicional composto
+  if (soma >= 10 OR ok) then
+  {
+    write("grande", soma).
+  }
+  else
+  {
+    write("pequeno", soma).
+  }
+
+  :3 laco pre-testado
+  i = 0.
+  while (i < 10) do
+  {
+    v[i] = i * i.
+    i = i + 1.
+  }
+
+  :3 laco pre-testado com variavel de controle
+  for (i = 0, i < 10, i = i + 1) do
+  {
+    write("v[i] = ", v[i]).
+  }
+
+  :3 laco pos-testado
+  do
+  {
+    i = i - 1.
+  }
+  while (i > 0).
+
+  imprime("soma final", soma).
+end.
