@@ -1,0 +1,35 @@
+:3 T3 item 2 -- um identificador so vale no escopo em que foi declarado.
+:3 Este programa DEVE falhar: tres usos vazam para escopos proibidos.
+program escopos.
+
+int:) global_a.
+
+function int:) primeira(int:) parametro)
+{
+  int:) local_primeira.
+  local_primeira = parametro + global_a.
+  return local_primeira.
+}
+
+function int:) segunda()
+{
+  :3 erro: 'local_primeira' pertence ao escopo de 'primeira'
+  return local_primeira.
+}
+
+begin
+  global_a = primeira(1) + segunda().
+
+  if (global_a > 0) then
+  {
+    int:) dentro_do_bloco.
+    dentro_do_bloco = 2.
+    write(dentro_do_bloco).
+  }
+
+  :3 erro: 'dentro_do_bloco' morreu junto com o bloco acima
+  write(dentro_do_bloco).
+
+  :3 erro: 'parametro' e um parametro de 'primeira'
+  global_a = parametro.
+end.

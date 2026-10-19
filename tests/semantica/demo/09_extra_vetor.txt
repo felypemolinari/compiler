@@ -1,0 +1,30 @@
+:3  "Vetor passado inteiro para uma funcao, funciona?"
+:3
+:3  ESPERADO: 1 erro, e ele e o interessante.
+:3    o vetor 'v' precisa de um indice para ser usado com o operador '+'
+:3
+:3  EXPLICACAO: ValueType carrega a flag isVector. Um vetor sem indice e
+:3  LEGAL como argumento de parametro vetorial (a chamada soma(v, 3) passa)
+:3  e ERRO em qualquer outro lugar (v + 1 nao passa).
+
+program extra_vetor.
+
+int:) v[3].
+int:) t.
+
+function int:) soma(int:) vet[], int:) n)
+{
+  return vet[0] + n.
+}
+
+begin
+  v[0] = 1.
+
+  :3 ok: vetor inteiro como argumento de parametro vetorial
+  t = soma(v, 3).
+
+  :3 erro: vetor inteiro no meio de uma conta
+  t = v + 1.
+
+  write(t).
+end.

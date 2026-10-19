@@ -1,0 +1,28 @@
+:3 T3 item 5 -- avisar (sem recusar o programa) o uso de lixo de memoria.
+:3 Programa valido: so avisos, nenhum erro.
+program inicializacao.
+
+int:) lida, atribuida, esquecida.
+int:) vetor[4].
+
+function int:) usa_parametro(int:) p)
+{
+  :3 ok: um parametro sempre chega com o valor que o chamador passou
+  return p.
+}
+
+begin
+  read(lida).
+  atribuida = 10.
+
+  :3 aviso: 'esquecida' nunca recebeu valor
+  write(lida + atribuida + esquecida).
+
+  :3 aviso: 'vetor' nunca recebeu valor
+  write(vetor[0]).
+
+  :3 so um aviso por identificador, mesmo usando de novo
+  write(esquecida).
+
+  write(usa_parametro(atribuida)).
+end.

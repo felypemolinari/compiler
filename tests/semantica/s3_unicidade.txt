@@ -1,0 +1,38 @@
+:3 T3 item 3 -- um nome so pode ser declarado uma vez em cada escopo.
+:3 Este programa DEVE falhar: quatro nomes repetidos.
+program unicidade.
+
+int:) valor.
+
+:3 erro: 'valor' repetido no escopo global
+float:) valor.
+
+:3 erro: repetido duas vezes na mesma declaracao
+int:) repetido, repetido.
+
+function int:) dobra(int:) numero)
+{
+  :3 erro: 'numero' ja e um parametro desta sub-rotina
+  int:) numero.
+  return numero * 2.
+}
+
+:3 erro: 'dobra' ja foi declarada no escopo global
+function int:) dobra(int:) outro)
+{
+  return outro.
+}
+
+function int:) sombra(int:) valor)
+{
+  :3 ok: um parametro pode repetir o nome de uma variavel global,
+  :3 porque sao escopos diferentes -- aqui 'valor' e o parametro
+  return valor + 1.
+}
+
+begin
+  valor = 1.
+  repetido = 0.
+  valor = dobra(valor) + sombra(valor) + repetido.
+  write(valor).
+end.

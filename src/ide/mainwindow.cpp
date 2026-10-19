@@ -3,6 +3,7 @@
 #include <QAction>
 #include <QApplication>
 #include <QCloseEvent>
+#include <QDockWidget>
 #include <QFile>
 #include <QFileDialog>
 #include <QFileInfo>
@@ -14,8 +15,10 @@
 #include <QSettings>
 #include <QSplitter>
 #include <QStatusBar>
+#include <QTableWidget>
 #include <QTextStream>
 #include <QToolBar>
+#include <QHeaderView>
 
 #include "codeeditor.h"
 #include "compiler.h"
@@ -26,6 +29,7 @@ MainWindow::MainWindow(QWidget *parent)
     m_lightPalette = QApplication::palette();
 
     buildUi();
+    buildSymbolDock();
     buildActions();
     setCurrentFile(QString());
 
@@ -71,6 +75,57 @@ void MainWindow::buildUi()
     updateCursorPosition();
 }
 
+// ---- Assignment requirement: a place in the IDE to look at the table ----
+void MainWindow::buildSymbolDock()
+{
+    m_symbols = new QTableWidget(this);
+    m_symbols->setColumnCount(8);
+    m_symbols->setHorizontalHeaderLabels({"Identificador", "Tipo", "Modalidade",
+                                          "Escopo", "Tamanho", "Linha",
+                                          "Inicializado", "Usado"});
+    m_symbols->verticalHeader()->setVisible(false);
+    m_symbols->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    m_symbols->setSelectionBehavior(QAbstractItemView::SelectRows);
+    m_symbols->setAlternatingRowColors(true);
+    // Columns are sized to their contents after every compilation, so the
+    // last one must not stretch over the free space and hide the others.
+    m_symbols->horizontalHeader()->setStretchLastSection(false);
+
+    m_symbolDock = new QDockWidget("Tabela de simbolos", this);
+    m_symbolDock->setObjectName("symbolTable");
+    m_symbolDock->setWidget(m_symbols);
+    addDockWidget(Qt::RightDockWidgetArea, m_symbolDock);
+    resizeDocks({m_symbolDock}, {620}, Qt::Horizontal);
+}
+
+// Repopulates the dock after a compilation. Rows survive a failed semantic
+// analysis on purpose: seeing what was declared is what explains the errors.
+void MainWindow::showSymbolTable(const CompileResult &result)
+{
+    m_symbols->clearContents();
+    m_symbols->setRowCount(result.symbols.size());
+
+    for (int row = 0; row < result.symbols.size(); ++row) {
+        const SymbolRow &symbol = result.symbols.at(row);
+        const QStringList cells{symbol.name, symbol.type, symbol.modality,
+                                symbol.scope, symbol.size,
+                                QString::number(symbol.line),
+                                symbol.initialized, symbol.used};
+
+        for (int column = 0; column < cells.size(); ++column) {
+            auto *item = new QTableWidgetItem(cells.at(column));
+            // An identifier nobody used is exactly what the warning is about.
+            if (symbol.used == "nao")
+                item->setForeground(QColor(170, 120, 0));
+            m_symbols->setItem(row, column, item);
+        }
+    }
+
+    m_symbols->resizeColumnsToContents();
+    m_symbolDock->setWindowTitle(QString("Tabela de simbolos (%1)")
+                                     .arg(result.symbols.size()));
+}
+
 void MainWindow::buildActions()
 {
     auto *fileMenu = menuBar()->addMenu("&File");
@@ -108,6 +163,11 @@ void MainWindow::buildActions()
     connect(m_darkModeAction, &QAction::toggled, this, &MainWindow::toggleDarkMode);
     viewMenu->addAction(m_darkModeAction);
     toolBar->addAction(m_darkModeAction);
+
+    QAction *showSymbols = m_symbolDock->toggleViewAction();
+    showSymbols->setText("&Symbol Table");
+    showSymbols->setShortcut(QKeySequence("Ctrl+T"));
+    viewMenu->addAction(showSymbols);
 
     toolBar->addSeparator();
     addItem(compilerMenu, "&Compile", QKeySequence(Qt::Key_F7), &MainWindow::compile);
@@ -191,6 +251,7 @@ void MainWindow::compile()
     m_messages->clear();
 
     const CompileResult result = Compiler::analyze(m_editor->toPlainText());
+    showSymbolTable(result);
 
     if (result.success) {
         log(result.message);
@@ -204,6 +265,19 @@ void MainWindow::compile()
             m_editor->markErrorLine(result.line);
         }
         log(text);
+    }
+
+    // Semantic diagnostics: every error and warning the analyser collected,
+    // in source order, so one compilation shows the whole picture.
+    if (!result.messages.isEmpty())
+        log(QString());
+
+    for (const Message &message : result.messages) {
+        log(QString("Line %1, column %2: %3: %4")
+                .arg(message.line)
+                .arg(message.column)
+                .arg(message.error ? "erro" : "aviso")
+                .arg(message.text));
     }
 }
 

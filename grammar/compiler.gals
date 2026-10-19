@@ -131,8 +131,8 @@ stmt_end      : "."
 <chamada>
 <literal>
 #Grammar
-<programa> ::= program id stmt_end <lista_globais> begin <lista_comandos> end stmt_end
-             | program id stmt_end begin <lista_comandos> end stmt_end ;
+<programa> ::= program id #1 stmt_end <lista_globais> begin <lista_comandos> end #2 stmt_end
+             | program id #1 stmt_end begin <lista_comandos> end #2 stmt_end ;
 
 <lista_globais> ::= <lista_globais> <item_global>
                   | <item_global> ;
@@ -145,32 +145,32 @@ stmt_end      : "."
 <lista_nomes> ::= <lista_nomes> comma <nome_decl>
                 | <nome_decl> ;
 
-<nome_decl> ::= id
-              | id open_bracket <tamanho> close_bracket ;
+<nome_decl> ::= id #4
+              | id #5 open_bracket <tamanho> close_bracket #6 ;
 
-<tamanho> ::= lit_int_dec
-            | lit_int_hex
-            | lit_int_bin ;
+<tamanho> ::= lit_int_dec #7
+            | lit_int_hex #7
+            | lit_int_bin #7 ;
 
-<tipo> ::= type_int
-         | type_float
-         | type_string
-         | type_boolean
-         | type_char ;
+<tipo> ::= type_int #3
+         | type_float #3
+         | type_string #3
+         | type_boolean #3
+         | type_char #3 ;
 
-<subrotina> ::= function <tipo> id open_paren <lista_params> close_paren <bloco>
-              | function <tipo> id open_paren close_paren <bloco>
-              | function id open_paren <lista_params> close_paren <bloco>
-              | function id open_paren close_paren <bloco> ;
+<subrotina> ::= function <tipo> id #8 open_paren <lista_params> close_paren <bloco> #10
+              | function <tipo> id #8 open_paren close_paren <bloco> #10
+              | function id #9 open_paren <lista_params> close_paren <bloco> #10
+              | function id #9 open_paren close_paren <bloco> #10 ;
 
 <lista_params> ::= <lista_params> comma <param>
                  | <param> ;
 
-<param> ::= <tipo> id
-          | <tipo> id open_bracket close_bracket ;
+<param> ::= <tipo> id #46
+          | <tipo> id #47 open_bracket close_bracket ;
 
-<bloco> ::= open_brace <lista_comandos> close_brace
-          | open_brace close_brace ;
+<bloco> ::= open_brace #11 <lista_comandos> close_brace #12
+          | open_brace #11 close_brace #12 ;
 
 <lista_comandos> ::= <lista_comandos> <comando>
                    | <comando> ;
@@ -185,100 +185,99 @@ stmt_end      : "."
             | <escrita>
             | <retorno> ;
 
-<comando_id> ::= id op_assign <expressao> stmt_end
-               | id open_bracket <expressao> close_bracket op_assign <expressao> stmt_end
-               | id open_paren <lista_args> close_paren stmt_end
-               | id open_paren close_paren stmt_end ;
+<comando_id> ::= id #13 op_assign <expressao> #14 stmt_end
+               | id #15 open_bracket <expressao> #16 close_bracket op_assign <expressao> #17 stmt_end
+               | id #18 open_paren <lista_args> close_paren #19 stmt_end
+               | id #18 open_paren close_paren #19 stmt_end ;
 
-<se> ::= if open_paren <expressao> close_paren then <bloco>
-       | if open_paren <expressao> close_paren then <bloco> else <bloco> ;
+<se> ::= if open_paren <expressao> #45 close_paren then <bloco>
+       | if open_paren <expressao> #45 close_paren then <bloco> else <bloco> ;
 
-<enquanto> ::= while open_paren <expressao> close_paren do <bloco> ;
+<enquanto> ::= while open_paren <expressao> #45 close_paren do <bloco> ;
 
-<para> ::= for open_paren <atrib_simples> comma <expressao> comma <atrib_simples> close_paren do <bloco> ;
+<para> ::= for open_paren <atrib_simples> comma <expressao> #45 comma <atrib_simples> close_paren do <bloco> ;
 
-<repita> ::= do <bloco> while open_paren <expressao> close_paren stmt_end ;
+<repita> ::= do <bloco> while open_paren <expressao> #45 close_paren stmt_end ;
 
-<atrib_simples> ::= id op_assign <expressao>
-                  | id open_bracket <expressao> close_bracket op_assign <expressao> ;
+<atrib_simples> ::= id #13 op_assign <expressao> #14
+                  | id #15 open_bracket <expressao> #16 close_bracket op_assign <expressao> #17 ;
 
 <leitura> ::= read open_paren <lista_variaveis> close_paren stmt_end ;
 
 <lista_variaveis> ::= <lista_variaveis> comma <variavel>
                     | <variavel> ;
 
-<variavel> ::= id
-             | id open_bracket <expressao> close_bracket ;
+<variavel> ::= id #20
+             | id #21 open_bracket <expressao> #22 close_bracket ;
 
-<escrita> ::= write open_paren <lista_args> close_paren stmt_end ;
+<escrita> ::= write #42 open_paren <lista_args> close_paren #43 stmt_end ;
 
-<retorno> ::= return <expressao> stmt_end
-            | return stmt_end ;
+<retorno> ::= return <expressao> #23 stmt_end
+            | return #24 stmt_end ;
 
-<lista_args> ::= <lista_args> comma <expressao>
-               | <expressao> ;
+<lista_args> ::= <lista_args> comma <expressao> #41
+               | <expressao> #41 ;
 
-<expressao> ::= <expressao> op_or <exp_e>
+<expressao> ::= <expressao> op_or #34 <exp_e> #25
               | <exp_e> ;
 
-<exp_e> ::= <exp_e> op_and <exp_nao>
+<exp_e> ::= <exp_e> op_and #34 <exp_nao> #26
           | <exp_nao> ;
 
-<exp_nao> ::= op_not <exp_nao>
+<exp_nao> ::= op_not #34 <exp_nao> #27
             | <exp_rel> ;
 
-<exp_rel> ::= <exp_bit_ou> <op_relacional> <exp_bit_ou>
+<exp_rel> ::= <exp_bit_ou> <op_relacional> <exp_bit_ou> #28
             | <exp_bit_ou> ;
 
-<op_relacional> ::= op_equal
-                  | op_not_equal
-                  | op_less
-                  | op_greater
-                  | op_less_eq
-                  | op_greater_eq ;
+<op_relacional> ::= op_equal #34
+                  | op_not_equal #34
+                  | op_less #34
+                  | op_greater #34
+                  | op_less_eq #34
+                  | op_greater_eq #34 ;
 
-<exp_bit_ou> ::= <exp_bit_ou> op_bit_or <exp_bit_xor>
+<exp_bit_ou> ::= <exp_bit_ou> op_bit_or #34 <exp_bit_xor> #29
                | <exp_bit_xor> ;
 
-<exp_bit_xor> ::= <exp_bit_xor> op_bit_xor <exp_bit_e>
+<exp_bit_xor> ::= <exp_bit_xor> op_bit_xor #34 <exp_bit_e> #29
                 | <exp_bit_e> ;
 
-<exp_bit_e> ::= <exp_bit_e> op_bit_and <exp_desloc>
+<exp_bit_e> ::= <exp_bit_e> op_bit_and #34 <exp_desloc> #29
               | <exp_desloc> ;
 
-<exp_desloc> ::= <exp_desloc> op_shift_left <exp_aritmetica>
-               | <exp_desloc> op_shift_right <exp_aritmetica>
+<exp_desloc> ::= <exp_desloc> op_shift_left #34 <exp_aritmetica> #29
+               | <exp_desloc> op_shift_right #34 <exp_aritmetica> #29
                | <exp_aritmetica> ;
 
-<exp_aritmetica> ::= <exp_aritmetica> op_add <termo>
-                   | <exp_aritmetica> op_sub <termo>
+<exp_aritmetica> ::= <exp_aritmetica> op_add #34 <termo> #30
+                   | <exp_aritmetica> op_sub #34 <termo> #30
                    | <termo> ;
 
-<termo> ::= <termo> op_mul <fator>
-          | <termo> op_div <fator>
-          | <termo> op_mod <fator>
+<termo> ::= <termo> op_mul #34 <fator> #30
+          | <termo> op_div #34 <fator> #30
+          | <termo> op_mod #34 <fator> #31
           | <fator> ;
 
-<fator> ::= op_sub <fator>
-          | op_add <fator>
-          | op_bit_not <fator>
+<fator> ::= op_sub #34 <fator> #32
+          | op_add #34 <fator> #32
+          | op_bit_not #34 <fator> #33
           | <primario> ;
 
-<primario> ::= id
-             | id open_bracket <expressao> close_bracket
+<primario> ::= id #35
+             | id #36 open_bracket <expressao> #37 close_bracket #38
              | <chamada>
              | <literal>
              | open_paren <expressao> close_paren ;
 
-<chamada> ::= id open_paren <lista_args> close_paren
-            | id open_paren close_paren ;
+<chamada> ::= id #40 open_paren <lista_args> close_paren #39
+            | id #40 open_paren close_paren #39 ;
 
-<literal> ::= lit_int_dec
-            | lit_int_hex
-            | lit_int_bin
-            | lit_real
-            | lit_char
-            | lit_string
-            | true
-            | false ;
-
+<literal> ::= lit_int_dec #44
+            | lit_int_hex #44
+            | lit_int_bin #44
+            | lit_real #44
+            | lit_char #44
+            | lit_string #44
+            | true #44
+            | false #44 ;

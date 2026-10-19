@@ -1,0 +1,46 @@
+:3 T3 item 1 -- cada identificador entra na tabela com tipo, modalidade e escopo.
+:3 Programa valido: compila sem nenhum erro e sem nenhum aviso.
+:3 Abra a "Tabela de simbolos" na IDE (Ctrl+T) para ver as cinco modalidades.
+program tabela.
+
+int:)     contador.
+float:)   acumulado.
+string:)  rotulo.
+boolean:) ligado.
+char:)    inicial.
+int:)     numeros[10].
+
+:3 funcao: parametro vetor + parametro simples, escopo proprio
+function int:) soma(int:) valores[], int:) quantidade)
+{
+  int:) i, total.
+  total = 0.
+  for (i = 0, i < quantidade, i = i + 1) do
+  {
+    total = total + valores[i].
+  }
+  return total.
+}
+
+:3 procedimento: sem tipo de retorno, aparece na tabela como void
+function mostra(string:) texto, int:) valor)
+{
+  write(texto, valor).
+  return.
+}
+
+begin
+  read(contador, acumulado, rotulo, inicial).
+  ligado = true.
+  numeros[0] = contador.
+
+  if (ligado) then
+  {
+    :3 'escopo' vive apenas dentro deste bloco
+    int:) escopo.
+    escopo = soma(numeros, 10).
+    mostra(rotulo, escopo).
+  }
+
+  write(acumulado, inicial).
+end.

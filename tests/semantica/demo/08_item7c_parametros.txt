@@ -1,0 +1,32 @@
+:3  ITEM 7 (2 pts) -- parte C: tipos em PARAMETROS e RETORNO.
+:3
+:3  ESPERADO: 3 erros.
+:3    a funcao 'ruim' devolve 'int', e o return traz 'string'
+:3    o parametro 1 de 'soma' espera 'int', e recebeu 'string'
+:3    a sub-rotina 'soma' espera 2 parametro(s), e recebeu 1
+
+program item7c.
+
+function int:) soma(int:) a, int:) b)
+{
+  return a + b.
+}
+
+function int:) ruim()
+{
+  :3 erro: a funcao e int e o return traz string
+  return "texto".
+}
+
+begin
+  :3 ok
+  write(soma(1, 2)).
+
+  :3 erro: tipo do parametro 1
+  write(soma("x", 2)).
+
+  :3 erro: quantidade de parametros
+  write(soma(1)).
+
+  write(ruim()).
+end.

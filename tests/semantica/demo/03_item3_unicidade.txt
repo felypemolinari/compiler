@@ -1,0 +1,28 @@
+:3  ITEM 3 (1 pt) -- unicidade do identificador dentro de um escopo.
+:3
+:3  ESPERADO: 2 erros.
+:3    'x' ja foi declarado no escopo 'global'
+:3    'p' ja foi declarado no escopo 'f'
+:3
+:3  SE O PROFESSOR PERGUNTAR "e sombreamento?": apague as 2 linhas de erro
+:3  e troque o parametro de 'f' para  int:) x  -- compila, porque o
+:3  parametro esta em outro escopo. Sao 2 linhas na tabela, nao 1.
+
+program item3.
+
+int:) x.
+
+:3 erro: mesmo nome, mesmo escopo
+float:) x.
+
+function int:) f(int:) p)
+{
+  :3 erro: 'p' ja e parametro desta sub-rotina
+  int:) p.
+  return p.
+}
+
+begin
+  x = f(1).
+  write(x).
+end.

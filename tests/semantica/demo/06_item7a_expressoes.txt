@@ -1,0 +1,46 @@
+:3  ITEM 7 (2 pts) -- parte A: tipos nas EXPRESSOES.
+:3
+:3  ESPERADO: 4 erros.
+:3    o operador '*' nao se aplica a 'string' e 'string'
+:3    o operador '%' exige dois valores int, e recebeu 'float' e 'int'
+:3    o operador 'AND' exige dois valores boolean, e recebeu 'int' e 'boolean'
+:3    a condicao precisa ser boolean, e nao 'int'
+:3
+:3  O exemplo do enunciado e exatamente o primeiro: multiplicacao de strings.
+
+program item7a.
+
+int:)     i.
+float:)   r.
+string:)  s.
+boolean:) b.
+
+begin
+  i = 1.
+  r = 1.5.
+  s = "x".
+  b = true.
+
+  :3 ok: int e float se misturam, resultado e float
+  r = i + r * 2.
+
+  :3 ok: % com dois inteiros
+  i = i % 2.
+
+  :3 erro: multiplicacao de strings
+  s = s * s.
+
+  :3 erro: % nao aceita float
+  i = r % 2.
+
+  :3 erro: AND exige dois boolean
+  b = i AND b.
+
+  :3 erro: a condicao de um if precisa ser boolean
+  if (i) then
+  {
+    write("nunca").
+  }
+
+  write(i, r, s, b).
+end.

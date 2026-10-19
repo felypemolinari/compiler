@@ -1,0 +1,18 @@
+:3  ITEM 4 (1 pt) -- avisar identificador declarado e nunca usado.
+:3
+:3  ESPERADO: compila (so aviso), 1 aviso.
+:3    'sobrando' (variavel) foi declarado no escopo 'global' e nunca foi usado
+:3
+:3  PONTO IMPORTANTE: 'sobrando' RECEBE um valor e mesmo assim avisa.
+:3  Atribuir nao conta como usar -- so leitura conta. E o mesmo criterio
+:3  do -Wunused-but-set-variable do gcc.
+
+program item4.
+
+int:) usada, sobrando.
+
+begin
+  usada = 1.
+  sobrando = 2.
+  write(usada).
+end.

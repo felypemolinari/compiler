@@ -1,0 +1,32 @@
+:3  "Blocos aninhados tem escopo proprio mesmo?"
+:3
+:3  ESPERADO: compila, 0 erro, 0 aviso.
+:3  Na tabela aparecem DUAS linhas chamadas 'a', em escopos diferentes:
+:3     a  int  variavel  global/bloco1
+:3     a  int  variavel  global/bloco1/bloco2
+:3
+:3  O write de dentro imprime 0, o de fora imprime n -- escopos distintos.
+
+program extra_blocos.
+
+int:) n.
+
+begin
+  read(n).
+
+  while (n > 0) do
+  {
+    int:) a.
+    a = n.
+
+    if (a > 1) then
+    {
+      int:) a.
+      a = 0.
+      write(a).
+    }
+
+    write(a).
+    n = n - 1.
+  }
+end.

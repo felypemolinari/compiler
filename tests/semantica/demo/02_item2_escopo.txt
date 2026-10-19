@@ -1,0 +1,38 @@
+:3  ITEM 2 (2 pts) -- identificador nao vaza do escopo onde foi declarado.
+:3
+:3  ESPERADO: 2 erros.
+:3    'local'  nao foi declarado no escopo 'global'   (era local de 'f')
+:3    'dentro' nao foi declarado no escopo 'global'   (morreu com o bloco)
+:3
+:3  PARA EXPLICAR: SymbolTable::lookup percorre so os escopos ABERTOS.
+:3  O escopo fechado sai da busca mas continua na tabela -- por isso
+:3  'local' e 'dentro' ainda aparecem no painel da direita.
+
+program item2.
+
+int:) g.
+
+function int:) f(int:) p)
+{
+  int:) local.
+  local = p * 2.
+  return local.
+}
+
+begin
+  g = f(2).
+
+  if (g > 0) then
+  {
+    int:) dentro.
+    dentro = 1.
+    write(dentro).
+  }
+
+  :3 erro: 'dentro' so existia dentro do bloco acima
+  write(dentro).
+
+  :3 erro: 'local' pertence ao escopo de 'f'
+  g = local.
+  write(g).
+end.

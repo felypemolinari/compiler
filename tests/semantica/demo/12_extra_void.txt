@@ -1,0 +1,29 @@
+:3  "Procedimento pode ser usado dentro de uma expressao?"
+:3
+:3  ESPERADO: 2 erros.
+:3    o procedimento 'p' nao pode devolver um valor
+:3    'p' e um procedimento e nao devolve um valor
+:3
+:3  Procedimento entra na tabela como funcao de tipo 'void'.
+
+program extra_void.
+
+int:) i.
+
+function p(int:) x)
+{
+  write(x).
+
+  :3 erro: procedimento nao devolve valor
+  return x.
+}
+
+begin
+  :3 ok: chamada como comando
+  p(1).
+
+  :3 erro: chamada como valor
+  i = p(2).
+
+  write(i).
+end.

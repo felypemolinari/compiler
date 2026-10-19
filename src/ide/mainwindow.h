@@ -3,10 +3,14 @@
 #include <QMainWindow>
 #include <QPalette>
 
+struct CompileResult;
+
 class CodeEditor;
 class QAction;
+class QDockWidget;
 class QLabel;
 class QPlainTextEdit;
+class QTableWidget;
 
 class MainWindow : public QMainWindow
 {
@@ -30,7 +34,9 @@ private slots:
 
 private:
     void buildUi();
+    void buildSymbolDock();
     void buildActions();
+    void showSymbolTable(const CompileResult &result);
     bool maybeSave();
     bool writeToFile(const QString &path);
     void setCurrentFile(const QString &path);
@@ -39,6 +45,8 @@ private:
 
     CodeEditor *m_editor = nullptr;
     QPlainTextEdit *m_messages = nullptr;
+    QTableWidget *m_symbols = nullptr;
+    QDockWidget *m_symbolDock = nullptr;
     QLabel *m_position = nullptr;
     QAction *m_darkModeAction = nullptr;
     QPalette m_lightPalette;

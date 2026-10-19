@@ -1,0 +1,67 @@
+:3 T3 item 7 -- compatibilidade de tipos nas atribuicoes, nos parametros
+:3 e no retorno das sub-rotinas.
+:3 Este programa DEVE falhar.
+program tipos_atribuicoes.
+
+int:)     inteiro.
+float:)   real.
+string:)  texto.
+boolean:) logico.
+char:)    letra.
+int:)     vetor[3].
+
+function int:) soma_dois(int:) a, int:) b)
+{
+  return a + b.
+}
+
+function int:) retorno_errado()
+{
+  :3 erro: a funcao devolve int e o return traz string
+  return "texto".
+}
+
+function procedimento()
+{
+  write("oi").
+  return.
+}
+
+begin
+  :3 ok: int cabe em float, o contrario nao
+  inteiro = 7.
+  real = inteiro.
+
+  :3 erro: float nao cabe em int
+  inteiro = real.
+
+  :3 erro: string em int
+  inteiro = "texto".
+
+  :3 erro: boolean em char
+  letra = true.
+
+  :3 erro: char em string
+  texto = letra.
+
+  :3 ok
+  logico = inteiro > 0.
+  texto = "ok".
+  letra = 'a'.
+  vetor[0] = soma_dois(1, 2).
+
+  :3 erro: o parametro 1 de 'soma_dois' espera int
+  inteiro = soma_dois("x", 2).
+
+  :3 erro: 'soma_dois' espera 2 parametros
+  inteiro = soma_dois(1).
+
+  :3 erro: um procedimento nao devolve valor
+  inteiro = procedimento().
+
+  :3 erro: 'vetor' precisa de um indice para receber um valor
+  vetor = 1.
+
+  inteiro = retorno_errado().
+  write(inteiro, real, texto, logico, letra, vetor[0]).
+end.

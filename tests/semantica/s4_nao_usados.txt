@@ -1,0 +1,27 @@
+:3 T3 item 4 -- avisar quando um identificador e declarado e nunca usado.
+:3 Programa valido: so avisos, nenhum erro. Atribuir nao conta como usar.
+program nao_usados.
+
+int:) usada, nunca_usada.
+int:) tabela[5].
+
+function int:) chamada(int:) entrada)
+{
+  :3 aviso: 'sobra' recebe valor mas ninguem le
+  int:) sobra.
+  sobra = entrada.
+  return entrada.
+}
+
+:3 aviso: esta sub-rotina nunca e chamada
+function int:) nunca_chamada()
+{
+  return 0.
+}
+
+begin
+  usada = 1.
+  nunca_usada = 2.
+  tabela[0] = chamada(usada).
+  write(usada, tabela[0]).
+end.

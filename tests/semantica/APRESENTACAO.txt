@@ -1,0 +1,439 @@
+:3 ===========================================================================
+:3  T3 -- ROTEIRO DE APRESENTACAO
+:3
+:3  ATENCAO: este arquivo NAO compila inteiro. Ele e uma cola.
+:3  Cada bloco abaixo e um programa completo e minimo.
+:3  Copie UM bloco por vez para o editor e aperte F7.
+:3
+:3  Todos os blocos foram conferidos: o resultado esperado esta escrito
+:3  em cada um, e nenhum deles produz aviso que nao esteja anunciado.
+:3 ===========================================================================
+
+
+:3 ---------------------------------------------------------------------------
+:3  COLA DE SINTAXE  (para nao travar digitando ao vivo)
+:3 ---------------------------------------------------------------------------
+:3
+:3  tipos        int:)   float:)   string:)   boolean:)   char:)
+:3  comentario   :3 uma linha          /* varias linhas */
+:3  fim de cmd   .   (ponto, sempre)
+:3  declarar     int:) a, b, v[10].
+:3  funcao       function int:) f(int:) a, int:) v[]) { return a. }
+:3  procedimento function p(int:) a) { write(a). return. }
+:3  if           if (c) then { } else { }
+:3  while        while (c) do { }
+:3  for          for (i = 0, i < n, i = i + 1) do { }
+:3  do-while     do { } while (c).
+:3  io           read(a).   write("txt", a).
+:3
+:3  Esqueleto minimo:
+:3      program p.
+:3      int:) a.
+:3      begin
+:3        a = 1.
+:3        write(a).
+:3      end.
+
+
+:3 @@@ BLOCO 1 -----------------------------------------------------------
+:3  ITEM 1 (2 pts) -- inserir na tabela com tipo, modalidade e escopo.
+:3  Tambem serve para o ITEM 6: aperte Ctrl+T e mostre o painel.
+:3
+:3  ESPERADO: compila, 0 erro, 0 aviso, 5 simbolos.
+:3  Na tabela aparecem as 5 modalidades e 2 escopos distintos:
+:3     total  int  variavel         global
+:3     lista  int  vetor            global   (tamanho 5)
+:3     soma   int  funcao           global
+:3     v      int  parametro vetor  soma
+:3     n      int  parametro        soma
+
+program item1.
+
+int:) total.
+int:) lista[5].
+
+function int:) soma(int:) v[], int:) n)
+{
+  return v[0] + n.
+}
+
+begin
+  lista[0] = 1.
+  total = soma(lista, 5).
+  write(total).
+end.
+
+
+:3 @@@ BLOCO 2 -----------------------------------------------------------
+:3  ITEM 2 (2 pts) -- identificador nao vaza do escopo onde foi declarado.
+:3
+:3  ESPERADO: 2 erros.
+:3    'local'  nao foi declarado no escopo 'global'   (era local de 'f')
+:3    'dentro' nao foi declarado no escopo 'global'   (morreu com o bloco)
+:3
+:3  PARA EXPLICAR: SymbolTable::lookup percorre so os escopos ABERTOS.
+:3  O escopo fechado sai da busca mas continua na tabela -- por isso
+:3  'local' e 'dentro' ainda aparecem no painel da direita.
+
+program item2.
+
+int:) g.
+
+function int:) f(int:) p)
+{
+  int:) local.
+  local = p * 2.
+  return local.
+}
+
+begin
+  g = f(2).
+
+  if (g > 0) then
+  {
+    int:) dentro.
+    dentro = 1.
+    write(dentro).
+  }
+
+  :3 erro: 'dentro' so existia dentro do bloco acima
+  write(dentro).
+
+  :3 erro: 'local' pertence ao escopo de 'f'
+  g = local.
+  write(g).
+end.
+
+
+:3 @@@ BLOCO 3 -----------------------------------------------------------
+:3  ITEM 3 (1 pt) -- unicidade do identificador dentro de um escopo.
+:3
+:3  ESPERADO: 2 erros.
+:3    'x' ja foi declarado no escopo 'global'
+:3    'p' ja foi declarado no escopo 'f'
+:3
+:3  SE O PROFESSOR PERGUNTAR "e sombreamento?": apague as 2 linhas de erro
+:3  e troque o parametro de 'f' para  int:) x  -- compila, porque o
+:3  parametro esta em outro escopo. Sao 2 linhas na tabela, nao 1.
+
+program item3.
+
+int:) x.
+
+:3 erro: mesmo nome, mesmo escopo
+float:) x.
+
+function int:) f(int:) p)
+{
+  :3 erro: 'p' ja e parametro desta sub-rotina
+  int:) p.
+  return p.
+}
+
+begin
+  x = f(1).
+  write(x).
+end.
+
+
+:3 @@@ BLOCO 4 -----------------------------------------------------------
+:3  ITEM 4 (1 pt) -- avisar identificador declarado e nunca usado.
+:3
+:3  ESPERADO: compila (so aviso), 1 aviso.
+:3    'sobrando' (variavel) foi declarado no escopo 'global' e nunca foi usado
+:3
+:3  PONTO IMPORTANTE: 'sobrando' RECEBE um valor e mesmo assim avisa.
+:3  Atribuir nao conta como usar -- so leitura conta. E o mesmo criterio
+:3  do -Wunused-but-set-variable do gcc.
+
+program item4.
+
+int:) usada, sobrando.
+
+begin
+  usada = 1.
+  sobrando = 2.
+  write(usada).
+end.
+
+
+:3 @@@ BLOCO 5 -----------------------------------------------------------
+:3  ITEM 5 (1 pt) -- avisar uso sem inicializacao (lixo de memoria).
+:3
+:3  ESPERADO: compila (so aviso), 1 aviso.
+:3    'b' pode estar sendo usado sem ter sido inicializado
+:3
+:3  PONTO IMPORTANTE: o enunciado pede "nao restringir, apenas avisar"
+:3  -- por isso o programa COMPILA. E 'p' nao avisa: parametro ja chega
+:3  com valor do chamador.
+
+program item5.
+
+int:) a, b.
+
+function int:) usa(int:) p)
+{
+  :3 nao avisa: parametro nasce inicializado
+  return p + 1.
+}
+
+begin
+  a = 1.
+
+  :3 aviso: 'b' nunca recebeu valor
+  write(a + b).
+
+  write(usa(a)).
+end.
+
+
+:3 @@@ BLOCO 6 -----------------------------------------------------------
+:3  ITEM 7 (2 pts) -- parte A: tipos nas EXPRESSOES.
+:3
+:3  ESPERADO: 4 erros.
+:3    o operador '*' nao se aplica a 'string' e 'string'
+:3    o operador '%' exige dois valores int, e recebeu 'float' e 'int'
+:3    o operador 'AND' exige dois valores boolean, e recebeu 'int' e 'boolean'
+:3    a condicao precisa ser boolean, e nao 'int'
+:3
+:3  O exemplo do enunciado e exatamente o primeiro: multiplicacao de strings.
+
+program item7a.
+
+int:)     i.
+float:)   r.
+string:)  s.
+boolean:) b.
+
+begin
+  i = 1.
+  r = 1.5.
+  s = "x".
+  b = true.
+
+  :3 ok: int e float se misturam, resultado e float
+  r = i + r * 2.
+
+  :3 ok: % com dois inteiros
+  i = i % 2.
+
+  :3 erro: multiplicacao de strings
+  s = s * s.
+
+  :3 erro: % nao aceita float
+  i = r % 2.
+
+  :3 erro: AND exige dois boolean
+  b = i AND b.
+
+  :3 erro: a condicao de um if precisa ser boolean
+  if (i) then
+  {
+    write("nunca").
+  }
+
+  write(i, r, s, b).
+end.
+
+
+:3 @@@ BLOCO 7 -----------------------------------------------------------
+:3  ITEM 7 (2 pts) -- parte B: tipos nas ATRIBUICOES.
+:3
+:3  ESPERADO: 3 erros.
+:3    nao e possivel atribuir um valor 'float' a um destino 'int'
+:3    nao e possivel atribuir um valor 'string' a um destino 'int'
+:3    o vetor 'v' precisa de um indice
+:3
+:3  REGRA: so int alarga para float. Todo o resto tem de bater exato.
+
+program item7b.
+
+int:)   i.
+float:) r.
+int:)   v[3].
+
+begin
+  i = 1.
+  v[0] = 1.
+
+  :3 ok: int cabe em float
+  r = i.
+
+  :3 erro: float nao cabe em int (perderia a parte decimal)
+  i = r.
+
+  :3 erro: string em int
+  i = "texto".
+
+  :3 erro: vetor inteiro nao recebe valor, falta o indice
+  v = 2.
+
+  write(i, r, v[0]).
+end.
+
+
+:3 @@@ BLOCO 8 -----------------------------------------------------------
+:3  ITEM 7 (2 pts) -- parte C: tipos em PARAMETROS e RETORNO.
+:3
+:3  ESPERADO: 3 erros.
+:3    a funcao 'ruim' devolve 'int', e o return traz 'string'
+:3    o parametro 1 de 'soma' espera 'int', e recebeu 'string'
+:3    a sub-rotina 'soma' espera 2 parametro(s), e recebeu 1
+
+program item7c.
+
+function int:) soma(int:) a, int:) b)
+{
+  return a + b.
+}
+
+function int:) ruim()
+{
+  :3 erro: a funcao e int e o return traz string
+  return "texto".
+}
+
+begin
+  :3 ok
+  write(soma(1, 2)).
+
+  :3 erro: tipo do parametro 1
+  write(soma("x", 2)).
+
+  :3 erro: quantidade de parametros
+  write(soma(1)).
+
+  write(ruim()).
+end.
+
+
+:3 ===========================================================================
+:3  EXTRAS -- para perguntas que o professor pode jogar
+:3 ===========================================================================
+
+
+:3 @@@ BLOCO 9 -----------------------------------------------------------
+:3  "Vetor passado inteiro para uma funcao, funciona?"
+:3
+:3  ESPERADO: 1 erro, e ele e o interessante.
+:3    o vetor 'v' precisa de um indice para ser usado com o operador '+'
+:3
+:3  EXPLICACAO: ValueType carrega a flag isVector. Um vetor sem indice e
+:3  LEGAL como argumento de parametro vetorial (a chamada soma(v, 3) passa)
+:3  e ERRO em qualquer outro lugar (v + 1 nao passa).
+
+program extra_vetor.
+
+int:) v[3].
+int:) t.
+
+function int:) soma(int:) vet[], int:) n)
+{
+  return vet[0] + n.
+}
+
+begin
+  v[0] = 1.
+
+  :3 ok: vetor inteiro como argumento de parametro vetorial
+  t = soma(v, 3).
+
+  :3 erro: vetor inteiro no meio de uma conta
+  t = v + 1.
+
+  write(t).
+end.
+
+
+:3 @@@ BLOCO 10 ----------------------------------------------------------
+:3  "E recursao? A funcao se enxerga?"
+:3
+:3  ESPERADO: compila, 0 erro, 0 aviso.
+:3
+:3  EXPLICACAO: a acao 8 insere 'fat' na tabela e SO DEPOIS abre o escopo
+:3  e analisa o corpo -- entao 'fat' ja esta visivel quando chama a si mesma.
+
+program extra_recursao.
+
+int:) n.
+
+function int:) fat(int:) k)
+{
+  if (k <= 1) then
+  {
+    return 1.
+  }
+  return k * fat(k - 1).
+}
+
+begin
+  read(n).
+  write(fat(n)).
+end.
+
+
+:3 @@@ BLOCO 11 ----------------------------------------------------------
+:3  "Blocos aninhados tem escopo proprio mesmo?"
+:3
+:3  ESPERADO: compila, 0 erro, 0 aviso.
+:3  Na tabela aparecem DUAS linhas chamadas 'a', em escopos diferentes:
+:3     a  int  variavel  global/bloco1
+:3     a  int  variavel  global/bloco1/bloco2
+:3
+:3  O write de dentro imprime 0, o de fora imprime n -- escopos distintos.
+
+program extra_blocos.
+
+int:) n.
+
+begin
+  read(n).
+
+  while (n > 0) do
+  {
+    int:) a.
+    a = n.
+
+    if (a > 1) then
+    {
+      int:) a.
+      a = 0.
+      write(a).
+    }
+
+    write(a).
+    n = n - 1.
+  }
+end.
+
+
+:3 @@@ BLOCO 12 ----------------------------------------------------------
+:3  "Procedimento pode ser usado dentro de uma expressao?"
+:3
+:3  ESPERADO: 2 erros.
+:3    o procedimento 'p' nao pode devolver um valor
+:3    'p' e um procedimento e nao devolve um valor
+:3
+:3  Procedimento entra na tabela como funcao de tipo 'void'.
+
+program extra_void.
+
+int:) i.
+
+function p(int:) x)
+{
+  write(x).
+
+  :3 erro: procedimento nao devolve valor
+  return x.
+}
+
+begin
+  :3 ok: chamada como comando
+  p(1).
+
+  :3 erro: chamada como valor
+  i = p(2).
+
+  write(i).
+end.

@@ -1,0 +1,26 @@
+:3  ITEM 1 (2 pts) -- inserir na tabela com tipo, modalidade e escopo.
+:3  Tambem serve para o ITEM 6: aperte Ctrl+T e mostre o painel.
+:3
+:3  ESPERADO: compila, 0 erro, 0 aviso, 5 simbolos.
+:3  Na tabela aparecem as 5 modalidades e 2 escopos distintos:
+:3     total  int  variavel         global
+:3     lista  int  vetor            global   (tamanho 5)
+:3     soma   int  funcao           global
+:3     v      int  parametro vetor  soma
+:3     n      int  parametro        soma
+
+program item1.
+
+int:) total.
+int:) lista[5].
+
+function int:) soma(int:) v[], int:) n)
+{
+  return v[0] + n.
+}
+
+begin
+  lista[0] = 1.
+  total = soma(lista, 5).
+  write(total).
+end.

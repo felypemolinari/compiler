@@ -1,6 +1,7 @@
 #include "compiler.h"
 
 #include <QByteArray>
+#include <algorithm>
 
 #include "AnalysisError.h"
 #include "LexicalError.h"
@@ -10,6 +11,7 @@
 #include "Sintatico.h"
 #include "SyntacticError.h"
 #include "Token.h"
+#include "symboltable.h"
 
 namespace {
 
@@ -88,6 +90,64 @@ CompileResult failure(const QByteArray &utf8, const QString &message, int offset
     return result;
 }
 
+QString yesNo(bool value)
+{
+    return value ? QString("sim") : QString("nao");
+}
+
+// The analyser works in byte offsets and knows nothing about Qt; everything
+// the IDE shows is translated here.
+QVector<SymbolRow> buildSymbolRows(const QByteArray &utf8, const sem::SymbolTable &table)
+{
+    QVector<SymbolRow> rows;
+    rows.reserve(static_cast<int>(table.symbols().size()));
+
+    for (const sem::Symbol &symbol : table.symbols()) {
+        SymbolRow row;
+        row.name = QString::fromStdString(symbol.name);
+        row.type = QString::fromUtf8(sem::typeName(symbol.type));
+        row.modality = QString::fromUtf8(sem::modalityName(symbol.modality));
+        row.scope = QString::fromStdString(symbol.scope);
+        row.size = symbol.modality == sem::Modality::Vector
+                       ? QString::number(symbol.size)
+                       : QString();
+        row.initialized = symbol.modality == sem::Modality::Function
+                              ? QString("-")
+                              : yesNo(symbol.initialized);
+        row.used = yesNo(symbol.used);
+
+        int column = 0;
+        offsetToLineColumn(utf8, symbol.position, &row.line, &column);
+        rows.append(row);
+    }
+
+    return rows;
+}
+
+QVector<Message> buildMessages(const QByteArray &utf8,
+                               const std::vector<sem::Diagnostic> &diagnostics)
+{
+    QVector<Message> messages;
+    messages.reserve(static_cast<int>(diagnostics.size()));
+
+    for (const sem::Diagnostic &diagnostic : diagnostics) {
+        Message message;
+        message.error = diagnostic.severity == sem::Diagnostic::Error;
+        message.text = QString::fromUtf8(diagnostic.message.c_str());
+        offsetToLineColumn(utf8, diagnostic.position, &message.line, &message.column);
+        messages.append(message);
+    }
+
+    // Warnings about unused identifiers are only known once a scope closes, so
+    // the analyser emits them out of order; sort so the panel reads top down.
+    std::stable_sort(messages.begin(), messages.end(),
+                     [](const Message &a, const Message &b) {
+                         return a.line != b.line ? a.line < b.line
+                                                 : a.column < b.column;
+                     });
+    return messages;
+}
+
 } // namespace
 
 namespace Compiler {
@@ -125,11 +185,37 @@ CompileResult analyze(const QString &source)
     }
 
     CompileResult result;
-    result.success = true;
+    result.symbols = buildSymbolRows(utf8, semanticAnalyser.symbolTable());
+    result.messages = buildMessages(utf8, semanticAnalyser.diagnostics());
+
+    int errors = 0;
+    for (const Message &message : result.messages)
+        errors += message.error ? 1 : 0;
+    const int warnings = result.messages.size() - errors;
+
+    result.success = errors == 0;
+
+    if (errors > 0) {
+        // The editor highlights the first one; the panel lists them all.
+        for (const Message &message : result.messages) {
+            if (message.error) {
+                result.line = message.line;
+                result.column = message.column;
+                break;
+            }
+        }
+        result.message = QString("Semantic analysis failed: %1 error(s), %2 warning(s).")
+                             .arg(errors)
+                             .arg(warnings);
+        return result;
+    }
+
     result.message = QString("Program compiled successfully.\n"
-                             "%1 line(s), %2 token(s) analyzed.")
+                             "%1 line(s), %2 token(s), %3 symbol(s), %4 warning(s).")
                          .arg(source.count('\n') + 1)
-                         .arg(countTokens(utf8));
+                         .arg(countTokens(utf8))
+                         .arg(result.symbols.size())
+                         .arg(warnings);
     return result;
 }
 

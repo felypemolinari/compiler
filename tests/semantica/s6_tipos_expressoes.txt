@@ -1,0 +1,60 @@
+:3 T3 item 7 -- compatibilidade de tipos nas expressoes.
+:3 Este programa DEVE falhar: cada linha marcada com "erro" e uma combinacao
+:3 de tipos que o analisador tem de recusar.
+program tipos_expressoes.
+
+int:)     inteiro.
+float:)   real.
+string:)  texto.
+boolean:) logico.
+char:)    letra.
+int:)     vetor[4].
+
+begin
+  inteiro = 2.
+  real = 1.5.
+  texto = "abc".
+  logico = true.
+  letra = 'x'.
+  vetor[0] = 1.
+
+  :3 ok: int e float se misturam em aritmetica, o resultado e float
+  real = inteiro + real * 2.
+
+  :3 erro: multiplicacao de strings
+  texto = texto * texto.
+
+  :3 erro: soma de string com int
+  inteiro = texto + inteiro.
+
+  :3 erro: % exige dois inteiros
+  inteiro = real % 2.
+
+  :3 erro: operador bit a bit nao se aplica a float
+  inteiro = real & 1.
+
+  :3 erro: AND exige dois boolean
+  logico = inteiro AND logico.
+
+  :3 erro: NOT exige boolean
+  logico = NOT inteiro.
+
+  :3 erro: '<' nao compara string com int
+  logico = texto < inteiro.
+
+  :3 erro: a condicao de um if precisa ser boolean
+  if (inteiro) then
+  {
+    write("nunca").
+  }
+
+  :3 erro: o indice de um vetor precisa ser int
+  write(vetor[real]).
+
+  :3 erro: o vetor precisa de um indice para entrar na conta
+  inteiro = vetor + 1.
+
+  :3 ok: comparacoes entre tipos iguais e aritmetica numerica
+  logico = letra == 'x' AND texto != "fim" AND real >= inteiro.
+  write(inteiro, real, texto, logico, letra, vetor[0]).
+end.

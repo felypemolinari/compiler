@@ -1,0 +1,24 @@
+:3  "E recursao? A funcao se enxerga?"
+:3
+:3  ESPERADO: compila, 0 erro, 0 aviso.
+:3
+:3  EXPLICACAO: a acao 8 insere 'fat' na tabela e SO DEPOIS abre o escopo
+:3  e analisa o corpo -- entao 'fat' ja esta visivel quando chama a si mesma.
+
+program extra_recursao.
+
+int:) n.
+
+function int:) fat(int:) k)
+{
+  if (k <= 1) then
+  {
+    return 1.
+  }
+  return k * fat(k - 1).
+}
+
+begin
+  read(n).
+  write(fat(n)).
+end.
